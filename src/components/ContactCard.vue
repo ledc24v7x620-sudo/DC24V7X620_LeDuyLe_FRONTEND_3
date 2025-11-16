@@ -24,9 +24,17 @@ export default {
       {{ contact.phone }}
     </div>
     <div class="p-1">
+      <strong>Sở thích:</strong>
+      {{ contact.hobby || "Chưa có" }}
+    </div>
+    <div class="p-1">
+      <strong>Tình trạng hôn nhân:</strong>
+      {{ contact.maritalStatus || "Chưa có" }}
+    </div>
+    <div class="p-1">
       <strong>Liên hệ yêu thích:&nbsp;</strong>
-      <i v-if="contact.favorite" class="fas fa-check"></i>
-      <i v-else class="fas fa-times"></i>
+      <i v-if="contact.favorite" class="fas fa-star text-warning"></i>
+      <i v-else class="far fa-star text-secondary"></i>
     </div>
   </div>
 </template>

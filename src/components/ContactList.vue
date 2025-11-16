@@ -21,6 +21,8 @@ export default {
       :class="{ active: index === activeIndex }"
       @click="updateActiveIndex(index)"
     >
+      <i v-if="contact.favorite" class="fas fa-star text-warning mr-2"></i>
+      <i v-else class="far fa-star text-secondary mr-2"></i>
       {{ contact.name }}
     </li>
   </ul>

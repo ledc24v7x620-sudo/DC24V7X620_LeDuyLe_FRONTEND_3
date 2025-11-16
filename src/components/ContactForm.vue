@@ -1,12 +1,11 @@
 <template>
-  <Form @submit="submitContact" :validation-schema="contactFormSchema">
+  <Form @submit="submitContact" :validation-schema="contactFormSchema" :initial-values="initialContactValues">
     <div class="form-group">
       <label for="name">Tên</label>
       <Field
         name="name"
         type="text"
         class="form-control"
-        vmodel="contactLocal.name"
       />
       <ErrorMessage name="name" class="error-feedback" />
     </div>
@@ -16,7 +15,6 @@
         name="email"
         type="email"
         class="form-control"
-        vmodel="contactLocal.email"
       />
       <ErrorMessage name="email" class="error-feedback" />
     </div>
@@ -26,7 +24,6 @@
         name="address"
         type="text"
         class="form-control"
-        vmodel="contactLocal.address"
       />
       <ErrorMessage name="address" class="error-feedback" />
     </div>
@@ -36,16 +33,40 @@
         name="phone"
         type="tel"
         class="form-control"
-        vmodel="contactLocal.phone"
       />
       <ErrorMessage name="phone" class="error-feedback" />
     </div>
+    <div class="form-group">
+      <label for="hobby">Sở thích</label>
+      <Field
+        name="hobby"
+        type="text"
+        class="form-control"
+        placeholder="Nhập sở thích"
+      />
+      <ErrorMessage name="hobby" class="error-feedback" />
+    </div>
+    <div class="form-group">
+      <label for="maritalStatus">Tình trạng hôn nhân</label>
+      <Field
+        name="maritalStatus"
+        as="select"
+        class="form-control"
+      >
+        <option value="">Chọn tình trạng</option>
+        <option value="Độc thân">Độc thân</option>
+        <option value="Đã kết hôn">Đã kết hôn</option>
+        <option value="Ly dị">Ly dị</option>
+        <option value="Góa">Góa</option>
+      </Field>
+      <ErrorMessage name="maritalStatus" class="error-feedback" />
+    </div>
     <div class="form-group form-check">
-      <input
+      <Field
         name="favorite"
         type="checkbox"
         class="form-check-input"
-        vmodel="contactLocal.favorite"
+        :value="true"
       />
       <label for="favorite" class="form-check-label">
         <strong>Liên hệ yêu thích</strong>
@@ -68,7 +89,6 @@
   </Form>
 </template>
 <script>
-import * as yup from "yup";
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 export default {
@@ -99,6 +119,8 @@ export default {
           /((09|03|07|08|05)+([0-9]{8})\b)/g,
           "Số điện thoại không hợp lệ."
         ),
+      hobby: yup.string().max(100, "Sở thích tối đa 100 ký tự."),
+      maritalStatus: yup.string().max(50, "Tình trạng hôn nhân tối đa 50 ký tự."),
     });
     return {
       // Chúng ta sẽ không muốn hiệu chỉnh props, nên tạo biến cục bộ
@@ -107,9 +129,30 @@ export default {
       contactFormSchema,
     };
   },
+  computed: {
+    // Đảm bảo initial values được format đúng cho vee-validate
+    initialContactValues() {
+      return {
+        ...this.contact,
+        favorite: this.contact.favorite === true || this.contact.favorite === "true"
+      };
+    },
+  },
   methods: {
-    submitContact() {
-      this.$emit("submit:contact", this.contactLocal);
+    submitContact(values) {
+      // Vee-validate trả về values khi form submit
+      // Xử lý favorite: checkbox trả về true/false hoặc undefined
+      // Đảm bảo tất cả các trường được gửi, kể cả khi empty
+      const contactData = {
+        name: values.name || "",
+        email: values.email || "",
+        address: values.address || "",
+        phone: values.phone || "",
+        hobby: values.hobby !== undefined ? values.hobby : "",
+        maritalStatus: values.maritalStatus !== undefined ? values.maritalStatus : "",
+        favorite: values.favorite === true || values.favorite === "true"
+      };
+      this.$emit("submit:contact", contactData);
     },
     deleteContact() {
       this.$emit("delete:contact", this.contactLocal.id);

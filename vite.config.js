@@ -18,6 +18,16 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3000/",
         changeOrigin: true,
+        secure: false,
+        ws: true,
+        configure: (proxy, options) => {
+          proxy.on("error", (err, req, res) => {
+            // Suppress connection refused errors when backend is not running
+          });
+          proxy.on("proxyReq", (proxyReq, req, res) => {
+            // Proxy request
+          });
+        },
       },
     },
   },
